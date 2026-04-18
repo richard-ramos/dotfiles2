@@ -42,22 +42,24 @@ fi
 log_success "GHC: $(ghc --version)"
 
 # --- Node.js (via nvm) ---
+export NVM_DIR="$HOME/.nvm"
 # Source nvm if already installed (re-run case)
-if [[ -s "$HOME/.nvm/nvm.sh" ]]; then
-    source "$HOME/.nvm/nvm.sh"
+if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+    source "$NVM_DIR/nvm.sh"
 fi
 if ! has node; then
     log_info "Installing Node.js via nvm"
+    mkdir -p "$NVM_DIR"
     # Download installer to file so errors are visible
     curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh -o /tmp/nvm-install.sh
     # Explicitly set NVM_DIR for the installer subprocess
-    NVM_DIR="$HOME/.nvm" bash /tmp/nvm-install.sh
+    NVM_DIR="$NVM_DIR" bash /tmp/nvm-install.sh
     rm -f /tmp/nvm-install.sh
-    if [[ ! -s "$HOME/.nvm/nvm.sh" ]]; then
-        log_error "nvm install failed — $HOME/.nvm/nvm.sh not found"
+    if [[ ! -s "$NVM_DIR/nvm.sh" ]]; then
+        log_error "nvm install failed - $NVM_DIR/nvm.sh not found"
         exit 1
     fi
-    source "$HOME/.nvm/nvm.sh"
+    source "$NVM_DIR/nvm.sh"
     nvm install --lts
     nvm alias default node
 fi
