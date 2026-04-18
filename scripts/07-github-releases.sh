@@ -10,7 +10,9 @@ mkdir -p "$INSTALL_DIR"
 # --- lazygit ---
 if ! has lazygit; then
     log_info "Installing lazygit"
-    gh_release_download "jesseduffield/lazygit" "Linux_${ARCH}" /tmp/lazygit.tar.gz
+    github_download "jesseduffield/lazygit" \
+        "https://github.com/jesseduffield/lazygit/releases/download/{VERSION}/lazygit_{VER}_Linux_${ARCH}.tar.gz" \
+        /tmp/lazygit.tar.gz
     tar -xzf /tmp/lazygit.tar.gz -C /tmp lazygit
     mv /tmp/lazygit "$INSTALL_DIR/"
     chmod +x "$INSTALL_DIR/lazygit"
@@ -20,17 +22,21 @@ fi
 # --- lazydocker ---
 if ! has lazydocker; then
     log_info "Installing lazydocker"
-    gh_release_download "jesseduffield/lazydocker" "Linux_${ARCH}" /tmp/lazydocker.tar.gz
+    github_download "jesseduffield/lazydocker" \
+        "https://github.com/jesseduffield/lazydocker/releases/download/{VERSION}/lazydocker_{VER}_Linux_${ARCH}.tar.gz" \
+        /tmp/lazydocker.tar.gz
     tar -xzf /tmp/lazydocker.tar.gz -C /tmp lazydocker
     mv /tmp/lazydocker "$INSTALL_DIR/"
     chmod +x "$INSTALL_DIR/lazydocker"
     rm -f /tmp/lazydocker.tar.gz
 fi
 
-# --- fastfetch ---
+# --- fastfetch (stable filename, no version needed) ---
 if ! has fastfetch; then
     log_info "Installing fastfetch"
-    gh_release_download "fastfetch-cli/fastfetch" "linux-${ARCH_ALT}.deb" /tmp/fastfetch.deb
+    github_download "fastfetch-cli/fastfetch" \
+        "https://github.com/fastfetch-cli/fastfetch/releases/latest/download/fastfetch-linux-${ARCH_ALT}.deb" \
+        /tmp/fastfetch.deb
     sudo dpkg -i /tmp/fastfetch.deb
     rm -f /tmp/fastfetch.deb
 fi
@@ -38,7 +44,7 @@ fi
 # --- ufw-docker ---
 if [[ ! -f /usr/local/bin/ufw-docker ]]; then
     log_info "Installing ufw-docker"
-    sudo curl -sL https://github.com/chaifeng/ufw-docker/raw/master/ufw-docker \
+    sudo curl -fSL https://github.com/chaifeng/ufw-docker/raw/master/ufw-docker \
         -o /usr/local/bin/ufw-docker
     sudo chmod +x /usr/local/bin/ufw-docker
 fi

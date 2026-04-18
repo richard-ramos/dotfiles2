@@ -41,34 +41,29 @@ apt_install() {
     fi
 }
 
-gh_release_download() {
-    local repo="$1" pattern="$2" dest="$3"
-    local url response
-    if has gh; then
-        log_info "Fetching latest release of $repo via gh CLI"
-        url=$(gh release view --repo "$repo" --json assets -q \
-            ".assets[].url | select(test(\"${pattern}\"))" 2>/dev/null | head -1)
-        if [[ -n "$url" ]]; then
-            log_info "Downloading $url"
-            curl -fSL "$url" -o "$dest"
-            return 0
-        else
-            log_warn "gh CLI found no asset matching '$pattern', falling back to API"
+# Download a GitHub release asset.
+# URL template supports {VERSION} (e.g. v0.44.1) and {VER} (e.g. 0.44.1).
+# If url_template is a plain URL with no placeholders, it is used as-is
+# (works with /releases/latest/download/<stable-filename> URLs).
+github_download() {
+    local repo="$1" url_template="$2" dest="$3"
+    local url="$url_template"
+    if [[ "$url_template" == *"{VERSION}"* || "$url_template" == *"{VER}"* ]]; then
+        log_info "Resolving latest version for $repo"
+        local response version
+        response=$(curl -sf "https://api.github.com/repos/$repo/releases/latest" || true)
+        if echo "$response" | grep -q "API rate limit"; then
+            log_error "GitHub API rate limit exceeded. Wait and retry."
+            return 1
         fi
-    fi
-    log_info "Fetching latest release of $repo via GitHub API"
-    response=$(curl -sL "https://api.github.com/repos/$repo/releases/latest")
-    # Check for rate limiting
-    if echo "$response" | grep -q "API rate limit exceeded"; then
-        log_error "GitHub API rate limit exceeded. Try again later or authenticate gh CLI (gh auth login)"
-        return 1
-    fi
-    url=$(echo "$response" \
-        | grep -oP "\"browser_download_url\":\s*\"\\K[^\"]*${pattern}[^\"]*" | head -1)
-    if [[ -z "$url" ]]; then
-        log_error "Could not find release asset matching '$pattern' for $repo"
-        log_error "API response (first 500 chars): ${response:0:500}"
-        return 1
+        version=$(echo "$response" | grep -oP '"tag_name":\s*"\K[^"]*' | head -1)
+        if [[ -z "$version" ]]; then
+            log_error "Could not determine latest version for $repo (response: ${response:0:200})"
+            return 1
+        fi
+        local ver_no_v="${version#v}"
+        url="${url_template/\{VERSION\}/$version}"
+        url="${url/\{VER\}/$ver_no_v}"
     fi
     log_info "Downloading $url"
     curl -fSL "$url" -o "$dest"
