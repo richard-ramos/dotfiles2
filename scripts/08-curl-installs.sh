@@ -4,6 +4,12 @@ source "$(dirname "$0")/../lib/common.sh"
 
 log_section "Curl-based installs"
 
+# Source nvm/go/cargo if available
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+[[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
+[[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
+export PATH="/usr/local/go/bin:$HOME/go/bin:$PATH"
+
 # --- Starship ---
 if ! has starship; then
     log_info "Installing Starship"

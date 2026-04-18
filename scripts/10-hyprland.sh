@@ -32,14 +32,20 @@ for pkg in "${HYPR_PKGS[@]}"; do
     fi
 done
 
-# --- swww (wallpaper daemon, cargo) ---
-if ! has swww; then
+# --- awww (wallpaper daemon, built from source) ---
+if ! has awww; then
     [[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
     if has cargo; then
-        log_info "Building swww via cargo"
-        cargo install swww
+        apt_install libwayland-dev wayland-protocols
+        log_info "Building awww from source (codeberg)"
+        tmpdir=$(mktemp -d)
+        git clone --depth 1 https://codeberg.org/LGFae/awww.git "$tmpdir"
+        cargo build --release --manifest-path "$tmpdir/Cargo.toml"
+        cp "$tmpdir/target/release/awww" "$tmpdir/target/release/awww-daemon" \
+            "$HOME/.local/bin/"
+        rm -rf "$tmpdir"
     else
-        log_warn "swww requires cargo; install Rust first"
+        log_warn "awww requires cargo (Rust 1.87+); install Rust first"
     fi
 fi
 

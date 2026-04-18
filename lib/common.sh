@@ -44,6 +44,15 @@ apt_install() {
 gh_release_download() {
     local repo="$1" pattern="$2" dest="$3"
     local url
+    if has gh; then
+        url=$(gh release view --repo "$repo" --json assets -q \
+            ".assets[].url | select(test(\"${pattern}\"))" 2>/dev/null | head -1)
+        if [[ -n "$url" ]]; then
+            log_info "Downloading $url"
+            curl -sL "$url" -o "$dest"
+            return 0
+        fi
+    fi
     url=$(curl -sL "https://api.github.com/repos/$repo/releases/latest" \
         | grep -oP "\"browser_download_url\":\s*\"\\K[^\"]*${pattern}[^\"]*" | head -1)
     if [[ -z "$url" ]]; then

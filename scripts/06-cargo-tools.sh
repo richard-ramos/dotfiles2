@@ -11,6 +11,9 @@ fi
 
 log_section "Cargo tools"
 
+# Build dependencies for bluetui (dbus), alacritty, etc.
+apt_install libdbus-1-dev
+
 cargo_install() {
     local bin="$1" crate="${2:-$1}"
     if has "$bin"; then
