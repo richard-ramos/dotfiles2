@@ -11,6 +11,8 @@ $cmd_duration\
 $line_break\
 $character"""
 
+palette = "catppuccin_mocha"
+
 [character]
 success_symbol = "[❯](blue)"
 error_symbol = "[❯](red)"
@@ -46,9 +48,6 @@ format = "[$symbol($version)]($style) "
 
 [docker_context]
 format = "[$symbol$context]($style) "
-
-[palette]
-palette = "catppuccin_mocha"
 
 [palettes.catppuccin_mocha]
 rosewater = "#f5e0dc"
