@@ -43,24 +43,35 @@ apt_install() {
 
 gh_release_download() {
     local repo="$1" pattern="$2" dest="$3"
-    local url
+    local url response
     if has gh; then
+        log_info "Fetching latest release of $repo via gh CLI"
         url=$(gh release view --repo "$repo" --json assets -q \
             ".assets[].url | select(test(\"${pattern}\"))" 2>/dev/null | head -1)
         if [[ -n "$url" ]]; then
             log_info "Downloading $url"
-            curl -sL "$url" -o "$dest"
+            curl -fSL "$url" -o "$dest"
             return 0
+        else
+            log_warn "gh CLI found no asset matching '$pattern', falling back to API"
         fi
     fi
-    url=$(curl -sL "https://api.github.com/repos/$repo/releases/latest" \
+    log_info "Fetching latest release of $repo via GitHub API"
+    response=$(curl -sL "https://api.github.com/repos/$repo/releases/latest")
+    # Check for rate limiting
+    if echo "$response" | grep -q "API rate limit exceeded"; then
+        log_error "GitHub API rate limit exceeded. Try again later or authenticate gh CLI (gh auth login)"
+        return 1
+    fi
+    url=$(echo "$response" \
         | grep -oP "\"browser_download_url\":\s*\"\\K[^\"]*${pattern}[^\"]*" | head -1)
     if [[ -z "$url" ]]; then
         log_error "Could not find release asset matching '$pattern' for $repo"
+        log_error "API response (first 500 chars): ${response:0:500}"
         return 1
     fi
     log_info "Downloading $url"
-    curl -sL "$url" -o "$dest"
+    curl -fSL "$url" -o "$dest"
 }
 
 config_link() {

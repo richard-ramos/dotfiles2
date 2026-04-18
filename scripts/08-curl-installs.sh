@@ -6,9 +6,20 @@ log_section "Curl-based installs"
 
 # Source nvm/go/cargo if available
 export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-[[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
+if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+    source "$NVM_DIR/nvm.sh"
+elif [[ -d "$NVM_DIR/versions/node" ]]; then
+    # nvm.sh missing but node installed — add to PATH directly
+    NODE_DIR=$(ls -d "$NVM_DIR/versions/node/"* 2>/dev/null | sort -V | tail -1)
+    [[ -n "$NODE_DIR" ]] && export PATH="$NODE_DIR/bin:$PATH"
+fi
 [[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
 export PATH="/usr/local/go/bin:$HOME/go/bin:$PATH"
+
+if ! has npm; then
+    log_error "npm not found. Run 05-languages.sh first to install Node.js."
+    exit 1
+fi
 
 # --- Starship ---
 if ! has starship; then

@@ -36,7 +36,7 @@ done
 if ! has awww; then
     [[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
     if has cargo; then
-        apt_install libwayland-dev wayland-protocols
+        apt_install libwayland-dev wayland-protocols liblz4-dev
         log_info "Building awww from source (codeberg)"
         tmpdir=$(mktemp -d)
         git clone --depth 1 https://codeberg.org/LGFae/awww.git "$tmpdir"
