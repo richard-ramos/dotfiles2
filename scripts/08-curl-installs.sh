@@ -4,15 +4,8 @@ source "$(dirname "$0")/../lib/common.sh"
 
 log_section "Curl-based installs"
 
-# Source nvm/go/cargo if available
-export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
-if [[ -s "$NVM_DIR/nvm.sh" ]]; then
-    source "$NVM_DIR/nvm.sh"
-elif [[ -d "$NVM_DIR/versions/node" ]]; then
-    # nvm.sh missing but node installed — add to PATH directly
-    NODE_DIR=$(ls -d "$NVM_DIR/versions/node/"* 2>/dev/null | sort -V | tail -1)
-    [[ -n "$NODE_DIR" ]] && export PATH="$NODE_DIR/bin:$PATH"
-fi
+# Source nvm/go/cargo — never pre-export NVM_DIR before sourcing
+[[ -s "$HOME/.nvm/nvm.sh" ]] && source "$HOME/.nvm/nvm.sh"
 [[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
 export PATH="/usr/local/go/bin:$HOME/go/bin:$PATH"
 
