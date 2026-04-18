@@ -6,6 +6,11 @@ log_section "Curl-based installs"
 
 # Source nvm/go/cargo — never pre-export NVM_DIR before sourcing
 if [[ -s "$HOME/.nvm/nvm.sh" ]]; then source "$HOME/.nvm/nvm.sh"; fi
+# Fallback: nvm sourced but default not set — find the latest installed node bin directly
+if ! has npm; then
+    _node_bin=$(ls -d "$HOME/.nvm/versions/node/"*/bin 2>/dev/null | sort -V | tail -1)
+    if [[ -n "$_node_bin" ]]; then export PATH="$_node_bin:$PATH"; fi
+fi
 if [[ -f "$HOME/.cargo/env" ]]; then source "$HOME/.cargo/env"; fi
 export PATH="/usr/local/go/bin:$HOME/go/bin:$PATH"
 

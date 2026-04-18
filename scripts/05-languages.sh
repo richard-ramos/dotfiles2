@@ -53,5 +53,6 @@ if ! has node; then
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
     source "$HOME/.nvm/nvm.sh"
     nvm install --lts
+    nvm alias default node
 fi
 log_success "Node: $(node --version)"
