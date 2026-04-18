@@ -5,8 +5,8 @@ source "$(dirname "$0")/../lib/common.sh"
 log_section "Curl-based installs"
 
 # Source nvm/go/cargo — never pre-export NVM_DIR before sourcing
-[[ -s "$HOME/.nvm/nvm.sh" ]] && source "$HOME/.nvm/nvm.sh"
-[[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
+if [[ -s "$HOME/.nvm/nvm.sh" ]]; then source "$HOME/.nvm/nvm.sh"; fi
+if [[ -f "$HOME/.cargo/env" ]]; then source "$HOME/.cargo/env"; fi
 export PATH="/usr/local/go/bin:$HOME/go/bin:$PATH"
 
 if ! has npm; then

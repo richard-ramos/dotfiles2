@@ -2,7 +2,7 @@
 set -euo pipefail
 source "$(dirname "$0")/../lib/common.sh"
 
-[[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
+if [[ -f "$HOME/.cargo/env" ]]; then source "$HOME/.cargo/env"; fi
 
 if ! has cargo; then
     log_error "Cargo not found. Run 05-languages.sh first."

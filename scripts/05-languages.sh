@@ -43,16 +43,15 @@ log_success "GHC: $(ghc --version)"
 
 # --- Node.js (via nvm, needed for claude/codex) ---
 # Source nvm if already installed (re-run case)
-_NVM_DIR="$HOME/.nvm"
-[[ -s "$_NVM_DIR/nvm.sh" ]] && source "$_NVM_DIR/nvm.sh"
+if [[ -s "$HOME/.nvm/nvm.sh" ]]; then
+    source "$HOME/.nvm/nvm.sh"
+fi
 if ! has node; then
     log_info "Installing Node.js via nvm"
-    # Unset NVM_DIR so the installer picks its own default (~/.nvm)
-    unset NVM_DIR
+    # Unset NVM_DIR so the installer uses its own default (~/.nvm)
+    unset NVM_DIR || true
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-    export NVM_DIR="$_NVM_DIR"
-    source "$NVM_DIR/nvm.sh"
+    source "$HOME/.nvm/nvm.sh"
     nvm install --lts
 fi
-export NVM_DIR="$_NVM_DIR"
 log_success "Node: $(node --version)"

@@ -34,7 +34,7 @@ done
 
 # --- awww (wallpaper daemon, built from source) ---
 if ! has awww; then
-    [[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
+    if [[ -f "$HOME/.cargo/env" ]]; then source "$HOME/.cargo/env"; fi
     if has cargo; then
         apt_install libwayland-dev wayland-protocols liblz4-dev
         log_info "Building awww from source (codeberg)"
